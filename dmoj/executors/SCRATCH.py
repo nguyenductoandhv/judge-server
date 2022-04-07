@@ -1,3 +1,4 @@
+import base64
 import os
 import shutil
 import subprocess
@@ -98,4 +99,6 @@ https://raw.githubusercontent.com/VNOI-Admin/judge-server/master/asset/scratch_t
             log = log.replace('scratch-vm encountered an error: ', '').strip()
             return '' if len(log) > 50 else log
         else:
-            raise InternalError(log)
+            with open(self._code, 'rb') as f:
+                code = base64.b64encode(f.read(30)).decode()
+            raise InternalError(log + ' ' + code + ' returncode: ' + str(process.returncode))
