@@ -6,3 +6,4 @@ requests
 setproctitle
 termcolor
 watchdog
+jsonpickle

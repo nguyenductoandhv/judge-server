@@ -1,7 +1,9 @@
-import base64
 import os
 import shutil
 import subprocess
+import tempfile
+
+import jsonpickle
 
 from dmoj.cptbox import TracedPopen
 from dmoj.error import CompileError, InternalError
@@ -99,6 +101,12 @@ https://raw.githubusercontent.com/VNOI-Admin/judge-server/master/asset/scratch_t
             log = log.replace('scratch-vm encountered an error: ', '').strip()
             return '' if len(log) > 50 else log
         else:
-            with open(self._code, 'rb') as f:
-                code = base64.b64encode(f.read(30)).decode()
-            raise InternalError(log + ' ' + code + ' returncode: ' + str(process.returncode))
+            tmp_dir = tempfile.mkdtemp(prefix='scratch')
+            shutil.copyfile(self._code, os.path.join(tmp_dir, 'code.sb3'))
+            with open(os.path.join(tmp_dir, 'result.json'), 'w') as f:
+                f.write(jsonpickle.encode(result))
+            with open(os.path.join(tmp_dir, 'process.json'), 'w') as f:
+                f.write(jsonpickle.encode(process))
+            with open(os.path.join(tmp_dir, 'self.json'), 'w') as f:
+                f.write(jsonpickle.encode(self))
+            raise InternalError(str(stderr) + ' ' + tmp_dir + ' ' + str(process.returncode))
