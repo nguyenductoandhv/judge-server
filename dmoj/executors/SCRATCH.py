@@ -91,6 +91,18 @@ https://raw.githubusercontent.com/VNOI-Admin/judge-server/master/asset/scratch_t
         self.validate_file(self._code)
 
     def populate_result(self, stderr, result, process):
+        is_ir_or_rte = (process.is_ir or process.is_rte) and not (process.is_tle or process.is_mle or process.is_ole)
+        if is_ir_or_rte and b'scratch-vm encountered an error' not in stderr:
+            tmp_dir = tempfile.mkdtemp(prefix='scratch')
+            shutil.copyfile(self._code, os.path.join(tmp_dir, 'code.sb3'))
+            with open(os.path.join(tmp_dir, 'result.json'), 'w') as f:
+                f.write(jsonpickle.encode(result))
+            with open(os.path.join(tmp_dir, 'process.json'), 'w') as f:
+                f.write(jsonpickle.encode(process))
+            with open(os.path.join(tmp_dir, 'self.json'), 'w') as f:
+                f.write(jsonpickle.encode(self))
+            raise InternalError(str(stderr) + ' ' + tmp_dir + ' ' + str(process.returncode))
+
         super().populate_result(stderr, result, process)
         if process.is_ir and b'scratch-vm encountered an error' in stderr:
             result.result_flag |= Result.RTE
@@ -101,12 +113,4 @@ https://raw.githubusercontent.com/VNOI-Admin/judge-server/master/asset/scratch_t
             log = log.replace('scratch-vm encountered an error: ', '').strip()
             return '' if len(log) > 50 else log
         else:
-            tmp_dir = tempfile.mkdtemp(prefix='scratch')
-            shutil.copyfile(self._code, os.path.join(tmp_dir, 'code.sb3'))
-            with open(os.path.join(tmp_dir, 'result.json'), 'w') as f:
-                f.write(jsonpickle.encode(result))
-            with open(os.path.join(tmp_dir, 'process.json'), 'w') as f:
-                f.write(jsonpickle.encode(process))
-            with open(os.path.join(tmp_dir, 'self.json'), 'w') as f:
-                f.write(jsonpickle.encode(self))
-            raise InternalError(str(stderr) + ' ' + tmp_dir + ' ' + str(process.returncode))
+            raise InternalError(log)
