@@ -589,7 +589,7 @@ def make_host_port(judgeenv):
 
 def main():  # pragma: no cover
     unicode_stdout_stderr()
-    builtin_int_patch.apply()
+    #builtin_int_patch.apply()
 
     if not sanity_check():
         return 1
