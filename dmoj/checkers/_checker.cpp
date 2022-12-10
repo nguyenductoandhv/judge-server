@@ -197,6 +197,7 @@ static int check_linebyline(const char *judge, size_t jlen, const char *process,
         }
         cnt_token += cnt_inline_token;
     }
+    return ACCEPTED;
 }
 
 static PyObject *checker_linebyline(PyObject *self, PyObject *args) {
