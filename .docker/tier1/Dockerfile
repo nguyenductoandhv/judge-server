@@ -13,11 +13,8 @@ RUN ARCH=$([ $(uname -m) = "x86_64" ] && echo "amd64" || echo "arm64") && \
 	mv scratch-run /usr/bin/scratch-run && \
 	rm scratch-run.zip
 
-RUN mkdir /library && cd /library && \
-	curl --location -o ac-library.zip https://github.com/atcoder/ac-library/releases/download/v1.4/ac-library.zip && \
-	unzip ac-library.zip -d ac-library
-
-RUN chmod -R 777 /library
+RUN curl --location -o ac-library.zip https://github.com/atcoder/ac-library/releases/download/v1.4/ac-library.zip && \
+	unzip ac-library.zip -d /usr/include/ac-library
 
 RUN mkdir /judge /problems && cd /judge && \
 	curl -L https://github.com/nguyenductoandhv/judge-server/archive/"${TAG}".tar.gz | tar -xz --strip-components=1 && \
