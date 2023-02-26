@@ -57,7 +57,7 @@ class GCCExecutor(SingleDigitVersionMixin, CompiledExecutor):
         return self.flags + [f'-fmax-errors={MAX_ERRORS}']
 
     def get_defines(self) -> List[str]:
-        return ['-DONLINE_JUDGE', '-I', '/usr/include/ac-library'] + self.defines
+        return ['-DONLINE_JUDGE'] + self.defines
 
     def get_compile_args(self) -> List[str]:
         command = self.get_command()
